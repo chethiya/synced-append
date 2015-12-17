@@ -27,9 +27,9 @@ class FileBase
  _createFile: ->
   if not @fd?
    @fd = fs.openSync @path, 'a'
-   stat = fs.statSync @fd
+   stat = fs.statSync @path
    @pos = stat.size
-   parentPath path.resolve @path, '..'
+   parentPath = path.resolve @path, '..'
    try
     @fdDir = fs.openSync parentPath, 'r'
   return

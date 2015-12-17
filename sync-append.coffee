@@ -19,9 +19,10 @@ class SyncAppend
    @fdJournalDir = fs.openSync dir, 'r'
   @files = {}
   @stopped = on
-  @closed = on
+  @closed = off
 
   @_recover()
+  files ?= {}
   for id, p of files
    p = path.normalize p
    base = new FileBase p
@@ -67,7 +68,7 @@ class SyncAppend
        Trying to recover a corrupted file #{obj.path} having file
        size #{stat.size} to file size #{obj.size}
       """
-     dir = path.resolve obj.path '..'
+     dir = path.resolve obj.path, '..'
      fdDir = null
      try
       fdDir = fs.openSync dir, 'r'
@@ -75,11 +76,14 @@ class SyncAppend
       fs.unlinkSync obj.path
       fs.fsyncSync fdDir
      else
-      fd = fs.openSync obj.path, 'w'
+      fd = fs.openSync obj.path, 'a'
       fs.ftruncateSync fd, obj.size
       fs.fsyncSync fd
+      fs.closeSync fd
       if fdDir?
        fs.fsyncSync fdDir
+     if fdDir?
+      fs.closeSync fdDir
    recovered = on
 
    #build @files
@@ -108,7 +112,7 @@ class SyncAppend
    for id, p of files
     if @files[id]?
      o = @files[id]
-     base.changePath p #no fsyncs as everything is synced and stopped
+     o.base.changePath p #no fsyncs as everything is synced and stopped
      o.path = p
     else
      base = new FileBase p
@@ -169,7 +173,7 @@ class SyncAppend
 
   if @stopped is on
    return off
-  for id, obj @files
+  for id, obj of @files
    obj.base.stopped = on
    obj.base.fsync()
 
