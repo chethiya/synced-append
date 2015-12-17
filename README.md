@@ -4,4 +4,4 @@ Append a file without leaving corrupted states when machine crashes. A set of fi
 
 This implements rollback journal mechanism using fsync(). So this module assumes fsync() does what it is supposed to do in the target system.
 
-Look for examples to see how this can be used.
+[Here](https://github.com/chethiya/sync-append/blob/master/examples/single_file/run.coffee) is an example on how to use this.
