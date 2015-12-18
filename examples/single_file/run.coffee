@@ -36,7 +36,12 @@ check()
 
 # If there are corrupted files, those are restored using the journal log
 # when the new instance is created bellow
-writer = new SyncAppend journalPath, files
+try
+ writer = new SyncAppend journalPath, files
+catch e
+ # Output file has been changed outside this program and can't be recovered
+ console.error e
+ process.exit 0
 
 # Check after recoverting
 if not check()
