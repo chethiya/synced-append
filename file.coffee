@@ -52,7 +52,8 @@ class FileBase
   if @fd?
    fs.fsyncSync @fd
    if @fdDir?
-    fs.fsyncSync @fdDir
+    try
+     fs.fsyncSync @fdDir
   @synced = on
   return on
 

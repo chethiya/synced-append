@@ -81,14 +81,17 @@ class SyncAppend
       fdDir = fs.openSync dir, 'r'
      if obj.size is 0
       fs.unlinkSync obj.path
-      fs.fsyncSync fdDir
+      if fdDir?
+       try
+        fs.fsyncSync fdDir
      else
-      fd = fs.openSync obj.path, 'a'
+      fd = fs.openSync obj.path, 'r+'
       fs.ftruncateSync fd, obj.size
       fs.fsyncSync fd
       fs.closeSync fd
       if fdDir?
-       fs.fsyncSync fdDir
+       try
+        fs.fsyncSync fdDir
      if fdDir?
       fs.closeSync fdDir
    recovered = on
@@ -104,7 +107,8 @@ class SyncAppend
   #delete journal log
   fs.unlinkSync @journalPath
   if @fdJournalDir?
-   fs.fsyncSync @fdJournalDir
+   try
+    fs.fsyncSync @fdJournalDir
   return recovered
 
  start: (files) ->
@@ -169,7 +173,8 @@ class SyncAppend
   fs.fsyncSync fd
   fs.closeSync fd
   if @fdJournalDir?
-   fs.fsyncSync @fdJournalDir
+   try
+    fs.fsyncSync @fdJournalDir
   return on
 
  sync: ->
@@ -194,7 +199,8 @@ class SyncAppend
 
   fs.unlinkSync @journalPath
   if @fdJournalDir?
-   fs.fsyncSync @fdJournalDir
+   try
+    fs.fsyncSync @fdJournalDir
   @stopped = on
 
  close: ->
