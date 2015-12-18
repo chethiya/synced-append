@@ -3,11 +3,13 @@ fs = require 'fs'
 path = require 'path'
 
 class FileBase
- constructor: (filePath) ->
+ constructor: (filePath, encoding) ->
   @path = filePath
   @buffer = []
+  @encoding = encoding
+  @encoding ?= "utf8"
 
-  @stopped = on
+  @stopped = on #controlled by SyncAppend
   @synced = on
   @closed = off
 
@@ -39,7 +41,7 @@ class FileBase
    return
   @_createFile()
   str = @buffer.join ''
-  @pos += fs.writeSync @fd, str, @pos, "utf8"
+  @pos += fs.writeSync @fd, str, @pos, @encoding
   @buffer = []
   return
 
@@ -54,7 +56,7 @@ class FileBase
   @synced = on
   return on
 
- changePath: (filePath) ->
+ changePath: (filePath, encoding) ->
   @fsync()
   if @fd?
    fs.close @fd
@@ -64,6 +66,8 @@ class FileBase
   @fdDir = null
   @pos = null
   @path = filePath
+  if encoding?
+   @encoding = encoding
   return
 
  close: ->

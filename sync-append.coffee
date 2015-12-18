@@ -23,11 +23,18 @@ class SyncAppend
 
   @_recover()
   files ?= {}
-  for id, p of files
-   p = path.normalize p
-   base = new FileBase p
+  for id, obj of files
    #don't replace existing working files
    if not @files[id]?
+    p = encoding = null
+    if 'string' is typeof obj
+     p = obj
+    else
+     p = obj.path
+     if obj.encoding?
+      encoding = obj.encoding
+    p = path.normalize p
+    base = new FileBase p, encoding
     @files[id] =
      path: p
      base: base
@@ -88,7 +95,7 @@ class SyncAppend
 
    #build @files
    for id, obj of log
-    base = new FileBase obj.path
+    base = new FileBase obj.path, obj.encoding
     @files[id] =
      path: obj.path
      base: base
@@ -109,13 +116,20 @@ class SyncAppend
 
   #update files
   if files?
-   for id, p of files
+   for id, obj of files
+    p = encoding = null
+    if 'string' is typeof obj
+     p = obj
+    else
+     p = obj.path
+     encoding = obj.encoding
+
     if @files[id]?
      o = @files[id]
-     o.base.changePath p #no fsyncs as everything is synced and stopped
+     o.base.changePath p, encoding #no fsyncs as everything is synced and stopped
      o.path = p
     else
-     base = new FileBase p
+     base = new FileBase p, encoding
      @files[id] =
       path: p
       base: base
@@ -146,6 +160,7 @@ class SyncAppend
    log[id] =
     path: obj.path
     size: size
+    encoding: obj.base.encoding
   str = JSON.stringify log
   hash = crypto.createHash('md5').update(str, "utf8").digest("hex")
   data = [hash, str].join ''
