@@ -18,13 +18,15 @@ system configurations where this is not guaranteed.
   country: './data/country.csv'
   city: './data/city.csv'
 
- # First parameters is the file used to store states so that commits can be
+ # - First parameters is the file used to store states so that commits can be
  # rolledback.
- # Second parameter is the set of files that need to be in sync
-
+ # - Second parameter is the set of files that need to be in sync
+ # - At the time of object creatation any previous uncomiited work will be
+ # rolled back.
  sync = new SyncedAppend './data/rollback.log', files
 
- sync.start() # starts the sync by rolling back uncommited changes
+ # starts the sync for appends. This creates the rollback log
+ sync.start()
 
  countryWriter = sync.getFile 'country'
  cityWriter = sync.getFile 'city'
@@ -55,7 +57,8 @@ system configurations where this is not guaranteed.
  langWriter.append 'countryCode,lanague\n'
  langWriter.append 'USA,English\n'
 
- # Commits above changes
+ # Commits above changes and auto start.
+ # This is euqauvlent to sync.syncStop and sync.start()
  sync.sync()
 
 ```
