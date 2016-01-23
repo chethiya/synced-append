@@ -6,11 +6,31 @@ in corrupted states.
 
 Note: It's assumed fs.fsyncSync() ensures data written to the hardware.
 
+## The Problem
+
+If strings are appended to files using FS.appendSync() it's not guaranteed data written
+to the disk in an atomic manner. This makes sense as if it initiates a write to disk for
+each small string append OS will be spending lot more time doing disk IO. But the problem with
+this is if the process crashes in an unexpted manner (e.g. a SIGKILL) it's possible there
+all the data you've appended might not reach the disk.
+
+## Solution
+
+[Transaction log](https://en.wikipedia.org/wiki/Transaction_log)
+
+[Files are hard](http://danluu.com/file-consistency/)
+
+## How to get it
+
+```
+ npm install synced-append
+```
+
 ## Example
 
 ```coffeescript
 
- SyncedAppend = require './synced-append'
+ SyncedAppend = require 'synced-append'
  files =
   country: './data/country.csv'
   city: './data/city.csv'
