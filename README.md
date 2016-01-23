@@ -8,17 +8,21 @@ Note: It's assumed fs.fsyncSync() ensures data written to the hardware.
 
 ## The Problem
 
-If strings are appended to files using FS.appendSync() it's not guaranteed data written
+If strings are appended to files using write() it's not guaranteed data written
 to the disk in an atomic manner. This makes sense as if it initiates a write to disk for
 each small string append OS will be spending lot more time doing disk IO. But the problem with
-this is if the process crashes in an unexpted manner (e.g. a SIGKILL) it's possible there
-all the data you've appended might not reach the disk.
+this is if the process crashes in an unexpected manner (e.g. a SIGKILL) it's all the appends
+you did have not reached the disk.
 
 ## Solution
 
-[Transaction log](https://en.wikipedia.org/wiki/Transaction_log)
+Please go through following links to understand basic concepts on how to solve
+these types of problems.
 
 [Files are hard](http://danluu.com/file-consistency/)
+
+[Transaction log](https://en.wikipedia.org/wiki/Transaction_log)
+
 
 ## How to get it
 
