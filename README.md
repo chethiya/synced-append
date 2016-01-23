@@ -64,7 +64,9 @@ these types of problems.
  sync.syncStop()
 
  newFiles =
-  language: './data/language.csv'
+  language:
+   path: './data/language.csv'
+   encoding: 'utf8'
 
  # Since sync was stopped previously can add new files when starting again
  sync.start newFiles
