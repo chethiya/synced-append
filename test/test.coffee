@@ -1,4 +1,4 @@
-SyncAppend = require './../../sync-append'
+SyncAppend = require './../../synced-append'
 fs = require 'fs'
 
 LINE_LEN = 99007
