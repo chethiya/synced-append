@@ -1,4 +1,4 @@
-SyncAppend = require './../../synced-append'
+SyncAppend = require './../synced-append'
 fs = require 'fs'
 
 LINE_LEN = 99007
@@ -32,6 +32,7 @@ check = ->
  return on
 
 # Check before recovering
+console.log 'Before recovery'
 check()
 
 # If there are corrupted files, those are restored using the journal log
@@ -43,7 +44,8 @@ catch e
  console.error e
  process.exit 0
 
-# Check after recoverting
+# Check after recovering
+console.log 'After recovery'
 if not check()
  process.exit 0
 
