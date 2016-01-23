@@ -10,9 +10,9 @@ Note: It's assumed fs.fsyncSync() ensures data written to the hardware.
 
 If strings are appended to files using write() it's not guaranteed data written
 to the disk in an atomic manner. This makes sense as if it initiates a write to disk for
-each small string append OS will be spending lot more time doing disk IO. But the problem with
-this is if the process crashes in an unexpected manner (e.g. a SIGKILL) it's all the appends
-you did have not reached the disk.
+each small string append, OS will be spending lot more time doing disk IO. But the problem with
+this is if the process crashes in an unexpected manner (e.g. a SIGKILL), it's possible that
+all the appends you did might not reach the disk.
 
 ## Solution
 
