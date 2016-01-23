@@ -1,11 +1,12 @@
-MAX_APPENDS = 10000
+BUFFER_SIZE = 1<<17 # 128KB
 fs = require 'fs'
 path = require 'path'
 
 class FileBase
  constructor: (filePath, encoding) ->
   @path = filePath
-  @buffer = []
+  @buffer = new Buffer BUFFER_SIZE
+  @bufferLen = 0
   @encoding = encoding
   @encoding ?= "utf8"
 
@@ -21,9 +22,32 @@ class FileBase
   if @stopped is on
    return off
   @synced = off
-  @buffer.push str
-  if @buffer.length > MAX_APPENDS
+
+  remain = BUFFER_SIZE - @bufferLen
+
+  # Optimization for smaller strings as creating lot of smaller Buffers
+  # can be expensive - https://nodejs.org/api/buffer.html#buffer_class_slowbuffer
+  if str.length * 2 < remain
+   len = @buffer.write str, @bufferLen, remain, @encoding
+   if len < remain
+    @bufferLen += len
+    return on
+
+  bytes = new Buffer str, @encoding
+  len = Math.min remain, bytes.length
+  @bufferLen += bytes.copy @buffer, @bufferLen, 0, len
+  if bytes.length >= remain
    @_flush()
+   start = remain
+   len = bytes.length - remain
+   chunks = Math.floor len / BUFFER_SIZE
+   if chunks > 0
+    length = BUFFER_SIZE * chunks
+    @pos += fs.writeSync @fd, bytes, start, length, @pos
+    start += length
+    #len = len % BUFFER_SIZE
+   @bufferLen = bytes.copy @buffer, 0, start, bytes.length
+
   return on
 
  _createFile: ->
@@ -37,12 +61,11 @@ class FileBase
   return
 
  _flush: ->
-  if @buffer.length is 0
+  if @bufferLen is 0
    return
   @_createFile()
-  str = @buffer.join ''
-  @pos += fs.writeSync @fd, str, @pos, @encoding
-  @buffer = []
+  @pos += fs.writeSync @fd, @buffer, 0, @bufferLen, @pos
+  @bufferLen = 0
   return
 
  fsync: ->
