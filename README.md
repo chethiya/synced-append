@@ -86,6 +86,9 @@ these types of problems.
 ## Example 2
 
 ```coffeescript
+ # Run this program multiple times. Every time it writes logs to a
+ # new files recoverying last written files
+
  SyncedAppend = require '../synced-append'
 
  # recovers last written file
