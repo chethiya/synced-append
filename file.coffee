@@ -48,7 +48,7 @@ class FileBase
    chunks = Math.floor len / BUFFER_SIZE
    if chunks > 0
     length = BUFFER_SIZE * chunks
-    @pos += fs.writeSync @fd, bytes, start, length, @pos
+    @pos += fs.writeSync @fd, bytes, start, length, null # @pos
     start += length
     #len = len % BUFFER_SIZE
    @bufferLen = bytes.copy @buffer, 0, start, bytes.length
@@ -69,7 +69,7 @@ class FileBase
   if @bufferLen is 0
    return
   @_createFile()
-  @pos += fs.writeSync @fd, @buffer, 0, @bufferLen, @pos
+  @pos += fs.writeSync @fd, @buffer, 0, @bufferLen, null # @pos
   @bufferLen = 0
   return
 
