@@ -3,7 +3,7 @@ SyncedAppend = require '../synced-append'
 # recovers last written file
 sync = new SyncedAppend "./data/example2_rollback.log"
 
-lowWriter = sync.getFile 'log'
+logWriter = sync.getFile 'log'
 if logWriter?
  console.log "Recovered the file at #{logWriter.getPath()}"
 
@@ -12,7 +12,7 @@ files =
  log: "./data/log-#{(new Date).getTime()}.txt"
 
 # starting write to new file
-sync.star files
+sync.start files
 if not logWriter?
  logWriter = sync.getFile 'log'
 logWriter.append "File written at #{(new Date).getTime()}"
@@ -24,6 +24,11 @@ sync.syncStop()
 files.log += ".more"
 sync.start files
 
+# Try removing these two lines. When this file is recovered the file
+# will be removed.
+logWriter.append 'first line\n'
+sync.sync()
+
 # Force stop the program with uncommited appends
 exit = (code) ->
  console.log """
@@ -31,7 +36,8 @@ exit = (code) ->
   Process is force stopped. There can be uncommited appends in the file
   #{logWriter.getPath()}
  """
-setTimeout exit, 100
+ process.exit code
+setTimeout exit, 100, 1
 
 # append the file without commiting so that file left with uncommited
 # appends when the program exits
