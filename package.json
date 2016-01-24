@@ -1,6 +1,6 @@
 {
   "name": "synced-append",
-  "version": "1.1.1",
+  "version": "1.1.4",
   "description": "Append text files without leaving corrupted states between process crashes. A set of files can be grouped together so that appends to all those files can be committed at once making sure files are in sync.",
   "main": "build/synced-append.js",
   "directories": {
@@ -22,7 +22,21 @@
     "sync",
     "append",
     "text file",
-    "data corruption"
+    "data corruption",
+    "transaction log",
+    "atomic write",
+    "atomic append",
+    "atomic file write",
+    "atomic file append",
+    "journal log",
+    "file write",
+    "file append",
+    "file sync",
+    "transactional append",
+    "transactional write",
+    "transactional file append",
+    "transactional file write",
+    "transactional"
   ],
   "author": "Chethiya Abeysinghe <chethiya@gmail.com> (chethiya.github.io)",
   "license": "MIT",

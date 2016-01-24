@@ -89,7 +89,7 @@ these types of problems.
  # Run this program multiple times. Every time it writes logs to a
  # new files recoverying last written files
 
- SyncedAppend = require '../synced-append'
+ SyncedAppend = require 'synced-append'
 
  # recovers last written file
  sync = new SyncedAppend "./data/example2_rollback.log"
