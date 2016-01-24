@@ -115,7 +115,7 @@ these types of problems.
  files.log += ".more"
  sync.start files
 
- # Try removing these two lines. If not bytes are committed to a file
+ # Try removing these two lines. If no bytes are committed to a file
  # the file will be removed when recovered.
  logWriter.append 'first line\n'
  sync.sync()
