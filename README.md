@@ -86,8 +86,8 @@ these types of problems.
 ## Example 2
 
 ```coffeescript
- # Run this program multiple times. Every time it writes logs to a
- # new files recoverying last written files
+ # Run this program multiple times. Every time it runs it writes to a
+ # new log file.
 
  SyncedAppend = require 'synced-append'
 
@@ -98,11 +98,11 @@ these types of problems.
  if logWriter?
   console.log "Recovered the file at #{logWriter.getPath()}"
 
- # Every time we write to new files
+ # Every time we write to a new file
  files =
   log: "./data/log-#{(new Date).getTime()}.txt"
 
- # starting write to new file
+ # starting write to the new file
  sync.start files
  if not logWriter?
   logWriter = sync.getFile 'log'
@@ -115,12 +115,12 @@ these types of problems.
  files.log += ".more"
  sync.start files
 
- # Try removing these two lines. When this file is recovered the file
- # will be removed.
+ # Try removing these two lines. If not bytes are committed to a file
+ # the file will be removed when recovered.
  logWriter.append 'first line\n'
  sync.sync()
 
- # Force stop the program with uncommited appends
+ # Force stop the program with uncommitted appends
  exit = (code) ->
   console.log """
    exit #{code}\n
@@ -130,12 +130,12 @@ these types of problems.
   process.exit code
  setTimeout exit, 100, 1
 
- # append the file without commiting so that file left with uncommited
+ # Append the file without commiting so that file left with uncommited
  # appends when the program exits
  MAXN = 1<<20
  next = ->
-  # Make sure appends are large enough to fill the file buffer and
-  # do an actual file write
+  # Make sure appends are large enough to fill the file buffer so that
+  # actual file write will happen.
   for i in [0...MAXN]
    logWriter.append "#{i}"
   setTimeout next, 0
