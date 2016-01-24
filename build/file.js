@@ -49,7 +49,7 @@
         chunks = Math.floor(len / BUFFER_SIZE);
         if (chunks > 0) {
           length = BUFFER_SIZE * chunks;
-          this.pos += fs.writeSync(this.fd, bytes, start, length, this.pos);
+          this.pos += fs.writeSync(this.fd, bytes, start, length, null);
           start += length;
         }
         this.bufferLen = bytes.copy(this.buffer, 0, start, bytes.length);
@@ -75,7 +75,7 @@
         return;
       }
       this._createFile();
-      this.pos += fs.writeSync(this.fd, this.buffer, 0, this.bufferLen, this.pos);
+      this.pos += fs.writeSync(this.fd, this.buffer, 0, this.bufferLen, null);
       this.bufferLen = 0;
     };
 
