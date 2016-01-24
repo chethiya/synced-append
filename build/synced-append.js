@@ -23,6 +23,10 @@
       return this.base.closed;
     };
 
+    File.prototype.getPath = function() {
+      return this.base.path;
+    };
+
     return File;
 
   })();
