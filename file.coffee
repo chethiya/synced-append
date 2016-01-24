@@ -25,8 +25,13 @@ class FileBase
 
   remain = BUFFER_SIZE - @bufferLen
 
-  # Optimization for smaller strings as creating lot of smaller Buffers
-  # can be expensive - https://nodejs.org/api/buffer.html#buffer_class_slowbuffer
+  # Optimization for smaller strings by not creating lot of smaller Buffers.
+  #
+  # Note: It's said that there are some optimizations [1] at the nodejs level not to
+  # create many small memory allocations, but create one large memory chunk
+  # and allocate for small Buffers from that chunk. But still it's very slow
+  # compared to Buffer.write()
+  # [1] - https://nodejs.org/api/buffer.html#buffer_class_slowbuffer
   if str.length * 2 < remain
    len = @buffer.write str, @bufferLen, remain, @encoding
    if len < remain
