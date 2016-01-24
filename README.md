@@ -1,8 +1,10 @@
-# Synced Append
+ # Synced Append
 
 A library that can be used to append multiple text files and do commits so that all files are in sync and doesn't leave in corrupted states between process crashes and restarts. In case you only
 have just one file to append still this library can be useful as it ensures files will not stuck
 in corrupted states.
+
+This supports Atomicity, Consistency and Durability in ACID. Isolation is not supported.
 
 Note: It's assumed fs.fsyncSync() ensures data written to the hardware.
 
