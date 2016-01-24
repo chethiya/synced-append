@@ -9,6 +9,7 @@ class File
 
  append: (str) -> @base.append str
  isClosed: -> @base.closed
+ getPath: -> @base.path
 
 class SyncAppend
  constructor: (journalPath, files) ->
