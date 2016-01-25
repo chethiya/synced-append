@@ -1,6 +1,6 @@
 FileBase = require './file'
-fs = require 'fs'
-path = require 'path'
+FS = require 'fs'
+PATH = require 'path'
 crypto = require 'crypto'
 
 class File
@@ -13,11 +13,11 @@ class File
 
 class SyncAppend
  constructor: (journalPath, files) ->
-  @journalPath = path.normalize journalPath
+  @journalPath = PATH.normalize journalPath
   @fdJournalDir = null
   try
-   dir = path.resole @journalPath, '..'
-   @fdJournalDir = fs.openSync dir, 'r'
+   dir = PATH.resolve @journalPath, '..'
+   @fdJournalDir = FS.openSync dir, 'r'
   @files = {}
   @stopped = on
   @closed = off
@@ -34,7 +34,7 @@ class SyncAppend
      p = obj.path
      if obj.encoding?
       encoding = obj.encoding
-    p = path.normalize p
+    p = PATH.normalize p
     base = new FileBase p, encoding
     @files[id] =
      path: p
@@ -48,7 +48,7 @@ class SyncAppend
   # Delete journal file
   data = null
   try
-    data = fs.readFileSync @journalPath, encoding: "utf8"
+    data = FS.readFileSync @journalPath, encoding: "utf8"
   catch
    return off
 
@@ -62,7 +62,7 @@ class SyncAppend
    for id, obj of log
     exists = off
     try
-     fs.accessSync obj.path, fs.F_OK
+     FS.accessSync obj.path, FS.F_OK
      exists = on
     if exists is off
      if obj.size > 0
@@ -70,31 +70,31 @@ class SyncAppend
        Trying to recover a non-existing file #{obj.path} to the file size #{obj.size}
       """
     else
-     stat = fs.statSync obj.path
+     stat = FS.statSync obj.path
      if stat.size < obj.size
       throw new Error """
        Trying to recover a corrupted file #{obj.path} having file
        size #{stat.size} to file size #{obj.size}
       """
-     dir = path.resolve obj.path, '..'
+     dir = PATH.resolve obj.path, '..'
      fdDir = null
      try
-      fdDir = fs.openSync dir, 'r'
+      fdDir = FS.openSync dir, 'r'
      if obj.size is 0
-      fs.unlinkSync obj.path
+      FS.unlinkSync obj.path
       if fdDir?
        try
-        fs.fsyncSync fdDir
+        FS.fsyncSync fdDir
      else
-      fd = fs.openSync obj.path, 'r+'
-      fs.ftruncateSync fd, obj.size
-      fs.fsyncSync fd
-      fs.closeSync fd
+      fd = FS.openSync obj.path, 'r+'
+      FS.ftruncateSync fd, obj.size
+      FS.fsyncSync fd
+      FS.closeSync fd
       if fdDir?
        try
-        fs.fsyncSync fdDir
+        FS.fsyncSync fdDir
      if fdDir?
-      fs.closeSync fdDir
+      FS.closeSync fdDir
    recovered = on
 
    #build @files
@@ -106,10 +106,10 @@ class SyncAppend
      file: new File base
 
   #delete journal log
-  fs.unlinkSync @journalPath
+  FS.unlinkSync @journalPath
   if @fdJournalDir?
    try
-    fs.fsyncSync @fdJournalDir
+    FS.fsyncSync @fdJournalDir
   return recovered
 
  start: (files) ->
@@ -155,11 +155,11 @@ class SyncAppend
   for id, obj of @files
    size = null
    try
-    fs.accessSync obj.path, fs.F_OK
+    FS.accessSync obj.path, FS.F_OK
    catch
     size = 0
    if not size?
-    stat = fs.statSync obj.path
+    stat = FS.statSync obj.path
     size = stat.size
 
    log[id] =
@@ -169,13 +169,13 @@ class SyncAppend
   str = JSON.stringify log
   hash = crypto.createHash('md5').update(str, "utf8").digest("hex")
   data = [hash, str].join ''
-  fd = fs.openSync @journalPath, 'w'
-  fs.writeSync fd, data, 0, "utf8"
-  fs.fsyncSync fd
-  fs.closeSync fd
+  fd = FS.openSync @journalPath, 'w'
+  FS.writeSync fd, data, 0, "utf8"
+  FS.fsyncSync fd
+  FS.closeSync fd
   if @fdJournalDir?
    try
-    fs.fsyncSync @fdJournalDir
+    FS.fsyncSync @fdJournalDir
   return on
 
  sync: ->
@@ -198,10 +198,10 @@ class SyncAppend
    obj.base.stopped = on
    obj.base.fsync()
 
-  fs.unlinkSync @journalPath
+  FS.unlinkSync @journalPath
   if @fdJournalDir?
    try
-    fs.fsyncSync @fdJournalDir
+    FS.fsyncSync @fdJournalDir
   @stopped = on
 
  close: ->
@@ -209,7 +209,7 @@ class SyncAppend
   for id, obj of @files
    obj.base.close()
   if @fdJournalDir?
-   fs.closeSync @fdJournalDir
+   FS.closeSync @fdJournalDir
   @closed = on
 
  getFile: (id) ->
