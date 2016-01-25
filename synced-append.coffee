@@ -15,8 +15,8 @@ class SyncAppend
  constructor: (journalPath, files) ->
   @journalPath = PATH.normalize journalPath
   @fdJournalDir = null
+  dir = PATH.resolve @journalPath, '..'
   try
-   dir = PATH.resolve @journalPath, '..'
    @fdJournalDir = FS.openSync dir, 'r'
   @files = {}
   @stopped = on
