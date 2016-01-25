@@ -1,6 +1,6 @@
 {
   "name": "synced-append",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Append text files without leaving corrupted states between process crashes. A set of files can be grouped together so that appends to all those files can be committed at once making sure files are in sync.",
   "main": "build/synced-append.js",
   "directories": {
