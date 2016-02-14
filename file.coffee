@@ -32,9 +32,11 @@ class FileBase
   # and allocate for small Buffers from that chunk. But still it's very slow
   # compared to Buffer.write()
   # [1] - https://nodejs.org/api/buffer.html#buffer_class_slowbuffer
-  if str.length * 2 < remain
+  if str.length < remain
    len = @buffer.write str, @bufferLen, remain, @encoding
-   if len < remain
+
+   # http://stackoverflow.com/questions/9533258/what-is-the-maximum-number-of-bytes-for-a-utf-8-encoded-character
+   if len < remain - 6
     @bufferLen += len
     return on
 
