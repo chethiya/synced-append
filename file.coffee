@@ -19,8 +19,8 @@ class FileBase
   @pos = null
 
  append: (str) ->
-  if @stopped is on
-   return off
+  if @stopped is on or str.length is 0
+   return 0
   @synced = off
 
   remain = BUFFER_SIZE - @bufferLen
@@ -38,7 +38,7 @@ class FileBase
    # http://stackoverflow.com/questions/9533258/what-is-the-maximum-number-of-bytes-for-a-utf-8-encoded-character
    if len < remain - 6
     @bufferLen += len
-    return on
+    return len
 
   bytes = new Buffer str, @encoding
   len = Math.min remain, bytes.length
@@ -55,7 +55,7 @@ class FileBase
     #len = len % BUFFER_SIZE
    @bufferLen = bytes.copy @buffer, 0, start, bytes.length
 
-  return on
+  return bytes.length
 
  _createFile: ->
   if not @fd?
