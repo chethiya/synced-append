@@ -1,4 +1,4 @@
-BUFFER_SIZE = 1<<17 # 128KB
+BUFFER_SIZE = 1<<23 # 8MB
 FS = require 'fs'
 PATH = require 'path'
 
