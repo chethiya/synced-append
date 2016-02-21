@@ -27,15 +27,17 @@ class SyncAppend
   for id, obj of files
    #don't replace existing working files
    if not @files[id]?
-    p = encoding = null
+    p = encoding = bufferSize = null
     if 'string' is typeof obj
      p = obj
     else
      p = obj.path
      if obj.encoding?
       encoding = obj.encoding
+     if obj.bufferSize?
+      bufferSize = obj.bufferSize
     p = PATH.normalize p
-    base = new FileBase p, encoding
+    base = new FileBase p, encoding, bufferSize
     @files[id] =
      path: p
      base: base
@@ -99,7 +101,7 @@ class SyncAppend
 
    #build @files
    for id, obj of log
-    base = new FileBase obj.path, obj.encoding
+    base = new FileBase obj.path, obj.encoding, obj.bufferSize
     @files[id] =
      path: obj.path
      base: base
@@ -122,19 +124,20 @@ class SyncAppend
   #update files
   if files?
    for id, obj of files
-    p = encoding = null
+    p = encoding = bufferSize = null
     if 'string' is typeof obj
      p = obj
     else
      p = obj.path
      encoding = obj.encoding
+     bufferSize = obj.bufferSize
 
     if @files[id]?
      o = @files[id]
      o.base.changePath p, encoding #no fsyncs as everything is synced and stopped
      o.path = p
     else
-     base = new FileBase p, encoding
+     base = new FileBase p, encoding, bufferSize
      @files[id] =
       path: p
       base: base
@@ -166,6 +169,7 @@ class SyncAppend
     path: obj.path
     size: size
     encoding: obj.base.encoding
+    bufferSize: obj.base.bufferSize
   str = JSON.stringify log
   hash = crypto.createHash('md5').update(str, "utf8").digest("hex")
   data = [hash, str].join ''

@@ -69,6 +69,7 @@ these types of problems.
   language:
    path: './data/language.csv'
    encoding: 'utf8'
+   bufferSize: 1<<23 # 8MB overrides default buffer size 128KB
 
  # Since sync was stopped previously can add new files when starting again
  sync.start newFiles

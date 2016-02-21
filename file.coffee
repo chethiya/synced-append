@@ -1,14 +1,15 @@
-BUFFER_SIZE = 1<<23 # 8MB
+BUFFER_SIZE = 1<<17 # 128KB
 FS = require 'fs'
 PATH = require 'path'
 
 class FileBase
- constructor: (filePath, encoding) ->
+ constructor: (filePath, @encoding, @bufferSize) ->
   @path = filePath
-  @buffer = new Buffer BUFFER_SIZE
-  @bufferLen = 0
-  @encoding = encoding
   @encoding ?= "utf8"
+  @bufferSize ?= BUFFER_SIZE
+
+  @buffer = new Buffer @bufferSize
+  @bufferLen = 0
 
   @stopped = on #controlled by SyncAppend
   @synced = on
@@ -23,7 +24,7 @@ class FileBase
    return 0
   @synced = off
 
-  remain = BUFFER_SIZE - @bufferLen
+  remain = @bufferSize - @bufferLen
 
   # Optimization for smaller strings by not creating lot of smaller Buffers.
   #
@@ -47,12 +48,12 @@ class FileBase
    @_flush()
    start = remain
    len = bytes.length - remain
-   chunks = Math.floor len / BUFFER_SIZE
+   chunks = Math.floor len / @bufferSize
    if chunks > 0
-    length = BUFFER_SIZE * chunks
+    length = @bufferSize * chunks
     @pos += FS.writeSync @fd, bytes, start, length, null # @pos
     start += length
-    #len = len % BUFFER_SIZE
+    #len = len % @bufferSize
    @bufferLen = bytes.copy @buffer, 0, start, bytes.length
 
   return bytes.length
