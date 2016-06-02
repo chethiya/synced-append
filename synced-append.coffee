@@ -26,8 +26,10 @@ class SyncAppend
   files ?= {}
   for id, obj of files
    #don't replace existing working files
+   if @files[id]? and obj.deleteOk?
+    @files[id].deleteOk = obj.deleteOk
    if not @files[id]?
-    p = encoding = bufferSize = null
+    p = encoding = bufferSize = deleteOk = null
     if 'string' is typeof obj
      p = obj
     else
@@ -36,12 +38,16 @@ class SyncAppend
       encoding = obj.encoding
      if obj.bufferSize?
       bufferSize = obj.bufferSize
+     if obj.deleteOk?
+      deleteOk = obj.deleteOk
     p = PATH.normalize p
+    deleteOk ?= off
     base = new FileBase p, encoding, bufferSize
     @files[id] =
      path: p
      base: base
      file: new File base
+     deleteOk: deleteOk
 
  _recover: ->
   # If @journalPath exists restore paths based on that
@@ -67,7 +73,7 @@ class SyncAppend
      FS.accessSync obj.path, FS.F_OK
      exists = on
     if exists is off
-     if obj.size > 0
+     if obj.size > 0 and obj.deleteOk isnt on
       throw new Error """
        Trying to recover a non-existing file #{obj.path} to the file size #{obj.size}
       """
@@ -106,6 +112,7 @@ class SyncAppend
      path: obj.path
      base: base
      file: new File base
+     deleteOk: if obj.deleteOk? then obj.deleteOk else off
 
   #delete journal log
   FS.unlinkSync @journalPath
@@ -124,24 +131,29 @@ class SyncAppend
   #update files
   if files?
    for id, obj of files
-    p = encoding = bufferSize = null
+    p = encoding = bufferSize = deleteOk = null
     if 'string' is typeof obj
      p = obj
     else
      p = obj.path
      encoding = obj.encoding
      bufferSize = obj.bufferSize
+     deleteOk = obj.deleteOk
 
     if @files[id]?
      o = @files[id]
      o.base.changePath p, encoding #no fsyncs as everything is synced and stopped
      o.path = p
+     if deleteOk?
+      o.deleteOk = deleteOk
     else
      base = new FileBase p, encoding, bufferSize
+     deleteOk ?= off
      @files[id] =
       path: p
       base: base
       file: new File base
+      deleteOk: deleteOk
 
   @_initJournal()
 
@@ -170,6 +182,7 @@ class SyncAppend
     size: size
     encoding: obj.base.encoding
     bufferSize: obj.base.bufferSize
+    deleteOk: obj.deleteOk
   str = JSON.stringify log
   hash = crypto.createHash('md5').update(str, "utf8").digest("hex")
   data = [hash, str].join ''

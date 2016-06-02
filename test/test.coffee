@@ -9,7 +9,9 @@ journalPath = "./rollback_journal.log"
 #a list of files that need to be in sync
 #only one file in this example
 files =
- output: filePath
+ output:
+  path: filePath
+  deleteOk: on
 
 start = null
 # Checks whether the output.txt got any corrupted lines
